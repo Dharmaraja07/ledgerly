@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../auth/presentation/pages/ui/group_dialog.dart';
 import '../../../../expense/presentation/pages/ui/expense_list_page.dart';
+import '../../../../settings/presentation/pages/settings_page.dart';
 import '../../bloc/group_bloc.dart';
 import '../../bloc/group_event.dart';
 import '../../bloc/group_state.dart';
@@ -31,7 +32,12 @@ class GroupListPage extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.settings_outlined),
-            onPressed: () {}, // Add settings later
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const SettingsPage()),
+              );
+            },
           ),
         ],
       ),

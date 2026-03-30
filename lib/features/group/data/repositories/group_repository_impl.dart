@@ -28,6 +28,19 @@ class GroupRepositoryImpl implements GroupRepository {
 
   @override
   Future<List<Group>> getGroups() async {
+    if ((await isar.groupIsars.count()) == 0) {
+      await createGroup(
+        Group(
+          id: 'default',
+          name: 'Personal Wallet',
+          memberIds: const [],
+          updatedAt: DateTime.now().toUtc(),
+          version: 1,
+          isDeleted: false,
+        ),
+      );
+    }
+
     final data = await isar.groupIsars.where().findAll();
 
     return data

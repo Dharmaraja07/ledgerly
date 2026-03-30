@@ -1,3 +1,9 @@
+enum TransactionType {
+  expense,
+  income,
+  transfer,
+}
+
 class Expense {
   final String id;
   final String groupId;
@@ -5,6 +11,7 @@ class Expense {
   final double amount;
   final String paidBy;
   final String category;
+  final TransactionType transactionType; 
 
   /// userId → amount owed
   final Map<String, double> splits;
@@ -20,6 +27,7 @@ class Expense {
     required this.amount,
     required this.paidBy,
     required this.category,
+    this.transactionType = TransactionType.expense, // Default for migration
     required this.splits,
     required this.updatedAt,
     required this.version,

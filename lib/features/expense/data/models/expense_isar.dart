@@ -13,6 +13,7 @@ class ExpenseIsar {
   late double amount;
   late String paidBy;
   late String category;
+  String? transactionType;
 
   late List<SplitIsar> splits;
 

@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 
+import '../../../domain/entitities/Expense.dart';
+
 Future<Map<String, dynamic>?> showAddExpenseSheet(
   BuildContext context,
+  List<String> categories,
 ) {
   final title = TextEditingController();
   final amount = TextEditingController();
 
-  String selectedCategory = 'General';
-  final categories = ['General', 'Food', 'Transport', 'Rent', 'Entertainment', 'Health', 'Shopping'];
+  List<String> uniqueCategories = categories.toSet().toList();
+  String selectedCategory = uniqueCategories.contains('General') ? 'General' : (uniqueCategories.isNotEmpty ? uniqueCategories.first : 'General');
+  
+  if (uniqueCategories.isEmpty) uniqueCategories = ['General'];
+  
+  TransactionType selectedType = TransactionType.expense;
 
   return showModalBottomSheet<Map<String, dynamic>>(
     context: context,
@@ -24,8 +31,25 @@ Future<Map<String, dynamic>?> showAddExpenseSheet(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text('Add Expense',
+              const Text('Add Transaction',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 12),
+              
+              // Type Toggle
+              SegmentedButton<TransactionType>(
+                segments: const [
+                  ButtonSegment(value: TransactionType.expense, label: Text('Expense'), icon: Icon(Icons.outbound)),
+                  ButtonSegment(value: TransactionType.income, label: Text('Income'), icon: Icon(Icons.attach_money)),
+                  ButtonSegment(value: TransactionType.transfer, label: Text('Transfer'), icon: Icon(Icons.swap_horiz)),
+                ],
+                selected: {selectedType},
+                onSelectionChanged: (Set<TransactionType> newSelection) {
+                   setState(() {
+                     selectedType = newSelection.first;
+                   });
+                },
+              ),
+
               const SizedBox(height: 12),
 
               TextField(
@@ -44,8 +68,8 @@ Future<Map<String, dynamic>?> showAddExpenseSheet(
               const SizedBox(height: 12),
 
               DropdownButtonFormField<String>(
-                value: selectedCategory,
-                items: categories.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
+                initialValue: selectedCategory,
+                items: uniqueCategories.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
                 onChanged: (v) => setState(() => selectedCategory = v!),
                 decoration: const InputDecoration(labelText: 'Category'),
               ),
@@ -59,6 +83,7 @@ Future<Map<String, dynamic>?> showAddExpenseSheet(
                       'title': title.text,
                       'amount': double.parse(amount.text),
                       'category': selectedCategory,
+                      'type': selectedType,
                     });
                   }
                 },
@@ -72,5 +97,4 @@ Future<Map<String, dynamic>?> showAddExpenseSheet(
       }
     ),
   );
-
 }

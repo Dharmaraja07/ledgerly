@@ -7,17 +7,21 @@ import '../../../../core/sync/sync_manager.dart';
 import '../../../../core/security/biometric_service.dart';
 import 'auth_event.dart';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 class AuthBloc extends Bloc<AuthEvent,AuthState> {
   final LoginUsecase loginUseCase;
   final AuthRepository repository;
   final SyncManager syncManager;
   final BiometricService biometricService;
+  final SharedPreferences prefs;
 
   AuthBloc(
     this.loginUseCase,
     this.repository,
     this.syncManager,
     this.biometricService,
+    this.prefs,
   ) : super(AuthInitial()) {
     on<AppStarted>(_onAppStarted);
     on<LoginRequested>(_onLoginRequested);
@@ -29,7 +33,9 @@ class AuthBloc extends Bloc<AuthEvent,AuthState> {
     final user = await repository.getCachedUser();
     if (user != null) {
       final isBioAvailable = await biometricService.isAvailable;
-      if (isBioAvailable) {
+      final isBioEnabled = prefs.getBool('biometric_enabled') ?? false;
+      
+      if (isBioAvailable && isBioEnabled) {
         emit(AuthBiometricRequired(user));
       } else {
         emit(AuthAuthenticated(user));
@@ -54,7 +60,8 @@ class AuthBloc extends Bloc<AuthEvent,AuthState> {
         event.email,
         event.password,
       );
-      await syncManager.sync(); // 🔥 important
+      await prefs.setString('profile_name', user.name);
+      await prefs.setString('profile_email', user.email);
 
       emit(AuthAuthenticated(user));
     } catch (e, s) {

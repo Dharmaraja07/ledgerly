@@ -11,6 +11,10 @@ import 'features/auth/presentation/bloc/auth_event.dart';
 import 'features/group/presentation/bloc/group_bloc.dart';
 import 'features/expense/presentation/bloc/expense_bloc.dart';
 
+import 'features/settings/presentation/bloc/settings_bloc.dart';
+import 'features/settings/presentation/bloc/settings_event.dart';
+import 'features/category/presentation/bloc/category_bloc.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   print('🔵🔵🔵 APP FULL RESTART - NEW CONFIG LOADED 🔵🔵🔵');
@@ -42,6 +46,12 @@ void main() async {
         ),
         BlocProvider(create: (_) => getIt<GroupBloc>()),
         BlocProvider(create: (_) => getIt<ExpenseBloc>()),
+        BlocProvider(
+          create: (_) => getIt<SettingsBloc>()..add(SettingsLoadRequested()),
+        ),
+        BlocProvider(
+          create: (_) => getIt<CategoryBloc>(),
+        ),
       ],
       child: const LedgerlyApp(),
     ),

@@ -22,6 +22,7 @@ class ExpenseRepositoryImpl implements ExpenseRepository {
       ..amount = expense.amount
       ..paidBy = expense.paidBy
       ..category = expense.category
+      ..transactionType = expense.transactionType.name
       ..splits = expense.splits.entries
           .map((e) => SplitIsar()
             ..userId = e.key
@@ -61,6 +62,7 @@ class ExpenseRepositoryImpl implements ExpenseRepository {
             amount: e.amount,
             paidBy: e.paidBy,
             category: e.category,
+            transactionType: TransactionType.values.asNameMap()[e.transactionType] ?? TransactionType.expense,
             splits: {
               for (final s in e.splits) s.userId: s.amount,
             },
@@ -85,6 +87,7 @@ class ExpenseRepositoryImpl implements ExpenseRepository {
     ..amount = expense.amount
     ..paidBy = expense.paidBy
     ..category = expense.category
+    ..transactionType = expense.transactionType.name
     ..splits = expense.splits.entries
         .map((e) => SplitIsar()
           ..userId = e.key

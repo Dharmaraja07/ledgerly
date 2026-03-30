@@ -2,6 +2,7 @@ import 'package:get_it/get_it.dart';
 import 'package:dio/dio.dart';
 import 'package:isar/isar.dart';
 
+import '../../features/category/domain/entities/category.dart';
 import '../config/app_config.dart';
 import '../database/isar_service.dart';
 import '../network/auth_interceptor.dart';
@@ -41,11 +42,31 @@ import '../../features/budget/domain/repositories/budget_repository.dart';
 import '../../features/budget/domain/usecases/get_budgets_usecase.dart';
 import '../../features/budget/presentation/bloc/budget_bloc.dart';
 
+// CATEGORY
+import '../../features/category/data/repositories/category_repository_impl.dart';
+import '../../features/category/presentation/bloc/category_bloc.dart';
+
 // EXPORT
 import '../../features/export/data/repositories/export_repository_impl.dart';
 import '../../features/export/domain/repositories/export_repository.dart';
 import '../../features/export/domain/usecases/export_expenses_usecase.dart';
 import '../../features/export/presentation/bloc/export_bloc.dart';
+import '../../features/bill_reminders/data/repositories/bill_reminder_repository.dart';
+import '../../features/bill_reminders/presentation/bloc/bill_reminder_bloc.dart';
+import '../../features/debt_planner/data/repositories/debt_repository.dart';
+import '../../features/debt_planner/presentation/bloc/debt_planner_bloc.dart';
+import '../../features/investment/data/repositories/investment_repository.dart';
+import '../../features/investment/presentation/bloc/investment_bloc.dart';
+import '../../features/document_vault/data/repositories/document_repository.dart';
+import '../../features/document_vault/presentation/bloc/document_vault_bloc.dart';
+import '../../features/bank_import/data/repositories/bank_import_repository.dart';
+import '../../features/bank_import/presentation/bloc/bank_import_bloc.dart';
+import '../../features/receipt_ocr/data/repositories/receipt_ocr_repository.dart';
+import '../../features/receipt_ocr/data/services/ocr_service.dart';
+import '../../features/receipt_ocr/presentation/bloc/receipt_ocr_bloc.dart';
+
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../features/settings/presentation/bloc/settings_bloc.dart';
 
 final getIt = GetIt.instance;
 
@@ -53,23 +74,27 @@ Future<void> setupDependencies() async {
   // ----------------------------
   // CORE
   // ----------------------------
+  final sharedPreferences = await SharedPreferences.getInstance();
+  getIt.registerSingleton<SharedPreferences>(sharedPreferences);
+
   final isarService = IsarService();
   await isarService.init();
 
+  getIt.registerSingleton<IsarService>(isarService);
   getIt.registerSingleton<Isar>(isarService.isar);
 
   getIt.registerLazySingleton<Dio>(
-  () {
-    print('✅✅✅ INITIALIZING DIO WITH 30s TIMEOUT ✅✅✅');
-    return Dio(
-    BaseOptions(
-      baseUrl: AppConfig.baseUrl,
-      connectTimeout: const Duration(seconds: 30),
-      receiveTimeout: const Duration(seconds: 30),
-    ),
+    () {
+      print('✅✅✅ INITIALIZING DIO WITH 30s TIMEOUT ✅✅✅');
+      return Dio(
+        BaseOptions(
+          baseUrl: AppConfig.baseUrl,
+          connectTimeout: const Duration(seconds: 30),
+          receiveTimeout: const Duration(seconds: 30),
+        ),
+      );
+    },
   );
-  },
-);
 
 
   getIt.registerLazySingleton<NetworkInfo>(() => NetworkInfo());
@@ -104,8 +129,8 @@ Future<void> setupDependencies() async {
   );
 
 
-final dio = getIt<Dio>();
-dio.interceptors.add(AuthInterceptor(getIt<TokenStorage>()));
+  final dio = getIt<Dio>();
+  dio.interceptors.add(AuthInterceptor(getIt<TokenStorage>()));
 
   // ----------------------------
   // AUTH - Use case
@@ -148,7 +173,12 @@ dio.interceptors.add(AuthInterceptor(getIt<TokenStorage>()));
       getIt<AuthRepository>(),
       getIt<SyncManager>(),
       getIt<BiometricService>(),
+      getIt<SharedPreferences>(),
     ),
+  );
+
+  getIt.registerFactory<SettingsBloc>(
+    () => SettingsBloc(getIt<SharedPreferences>()),
   );
 
   getIt.registerFactory<GroupBloc>(
@@ -164,7 +194,10 @@ dio.interceptors.add(AuthInterceptor(getIt<TokenStorage>()));
   );
 
   getIt.registerFactory<AnalyticsBloc>(
-    () => AnalyticsBloc(getIt<GetSpendingBreakdownUseCase>()),
+    () => AnalyticsBloc(
+      getIt<GetSpendingBreakdownUseCase>(),
+      getIt<AnalyticsRepository>(),
+    ),
   );
 
   // ----------------------------
@@ -185,7 +218,10 @@ dio.interceptors.add(AuthInterceptor(getIt<TokenStorage>()));
   // EXPORT
   // ----------------------------
   getIt.registerLazySingleton<ExportRepository>(
-    () => ExportRepositoryImpl(getIt<Isar>()),
+    () => ExportRepositoryImpl(
+      getIt<Isar>(),
+      getIt<SharedPreferences>(),
+    ),
   );
 
   getIt.registerLazySingleton<ExportExpensesUseCase>(
@@ -194,5 +230,66 @@ dio.interceptors.add(AuthInterceptor(getIt<TokenStorage>()));
 
   getIt.registerFactory<ExportBloc>(
     () => ExportBloc(getIt<ExportExpensesUseCase>()),
+  );
+
+  // ----------------------------
+  // CATEGORY
+  // ----------------------------
+  getIt.registerLazySingleton<CategoryRepository>(
+    () => CategoryRepositoryImpl(getIt<IsarService>()),
+  );
+
+  getIt.registerFactory<CategoryBloc>(
+    () => CategoryBloc(getIt<CategoryRepository>()),
+  );
+
+  // ----------------------------
+  // ADVANCED OFFLINE MODULES
+  // ----------------------------
+  getIt.registerLazySingleton<BillReminderRepository>(
+    () => BillReminderRepositoryImpl(getIt<IsarService>()),
+  );
+  getIt.registerFactory<BillReminderBloc>(
+    () => BillReminderBloc(getIt<BillReminderRepository>()),
+  );
+
+  getIt.registerLazySingleton<DebtRepository>(
+    () => DebtRepositoryImpl(getIt<IsarService>()),
+  );
+  getIt.registerFactory<DebtPlannerBloc>(
+    () => DebtPlannerBloc(getIt<DebtRepository>()),
+  );
+
+  getIt.registerLazySingleton<InvestmentRepository>(
+    () => InvestmentRepositoryImpl(getIt<IsarService>()),
+  );
+  getIt.registerFactory<InvestmentBloc>(
+    () => InvestmentBloc(getIt<InvestmentRepository>()),
+  );
+
+  getIt.registerLazySingleton<DocumentRepository>(
+    () => DocumentRepositoryImpl(getIt<IsarService>()),
+  );
+  getIt.registerFactory<DocumentVaultBloc>(
+    () => DocumentVaultBloc(getIt<DocumentRepository>()),
+  );
+
+  getIt.registerLazySingleton<BankImportRepository>(
+    () => BankImportRepository(getIt<IsarService>(), getIt<SharedPreferences>()),
+  );
+  getIt.registerFactory<BankImportBloc>(
+    () => BankImportBloc(getIt<BankImportRepository>()),
+  );
+
+  getIt.registerLazySingleton<OcrService>(() => MockOcrService());
+  getIt.registerLazySingleton<ReceiptOcrRepository>(
+    () => ReceiptOcrRepository(getIt<IsarService>(), getIt<OcrService>()),
+  );
+  getIt.registerFactory<ReceiptOcrBloc>(
+    () => ReceiptOcrBloc(
+      getIt<ReceiptOcrRepository>(),
+      getIt<ExpenseRepository>(),
+      getIt<SharedPreferences>(),
+    ),
   );
 }

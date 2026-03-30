@@ -1,11 +1,9 @@
-
-
-
 import '../../domain/entities/user.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/auth_local_datasource.dart';
 import '../datasources/auth_remote_datasource.dart';
 import '../models/user_isar.dart';
+import 'package:uuid/uuid.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource remote;
@@ -46,36 +44,51 @@ class AuthRepositoryImpl implements AuthRepository {
   //     );
   //   }
   // }
+  @override
+  Future<User> login({
+    required String email,
+    required String password,
+  }) async {
+    final normalizedEmail = email.trim().toLowerCase();
+    final cached = local.getUser();
 
+    if (cached != null && cached.email.toLowerCase() == normalizedEmail) {
+      return User(
+        id: cached.userId,
+        email: cached.email,
+        name: cached.name,
+      );
+    }
 
- @override
-Future<User> login({
-  required String email,
-  required String password,
-}) async {
-  final data = await remote.login(email, password);
+    final displayName = _displayNameFromEmail(normalizedEmail);
+    final userIsar = UserIsar()
+      ..userId = const Uuid().v4()
+      ..email = normalizedEmail
+      ..name = displayName
+      ..accessToken = 'local-session'
+      ..refreshToken = password;
 
-  final user = data['user'];
-  final access = data['access_token'];
-  final refresh = data['refresh_token'];
+    await local.saveUser(userIsar);
 
-  final userIsar = UserIsar()
-    ..userId = user['id']
-    ..email = user['email']
-    ..name = user['name']
-    ..accessToken = access
-    ..refreshToken = refresh;
+    return User(
+      id: userIsar.userId,
+      email: userIsar.email,
+      name: userIsar.name,
+    );
+  }
 
-  await local.saveUser(userIsar);
+  String _displayNameFromEmail(String email) {
+    final localPart = email.split('@').first.trim();
+    if (localPart.isEmpty) {
+      return 'Ledgerly User';
+    }
 
-  return User(
-    id: userIsar.userId,
-    email: userIsar.email,
-    name: userIsar.name,
-  );
-}
-
-
+    return localPart
+        .split(RegExp(r'[._-]+'))
+        .where((segment) => segment.isNotEmpty)
+        .map((segment) => '${segment[0].toUpperCase()}${segment.substring(1)}')
+        .join(' ');
+  }
 
   @override
   Future<User?> getCachedUser() async {

@@ -8,15 +8,43 @@ class ExportBloc extends Bloc<ExportEvent, ExportState> {
 
   ExportBloc(this.exportExpenses) : super(ExportInitial()) {
     on<ExportToCsv>(_onExportToCsv);
+    on<ExportBackupRequested>(_onExportBackupRequested);
+    on<RestoreLatestBackupRequested>(_onRestoreLatestBackupRequested);
   }
 
   Future<void> _onExportToCsv(ExportToCsv event, Emitter<ExportState> emit) async {
     emit(ExportLoading());
     try {
-      final path = await exportExpenses(event.groupId);
+      final path = await exportExpenses(event.groupId, format: event.format);
       emit(ExportSuccess(path));
     } catch (e) {
       emit(ExportError("Failed to export: $e"));
+    }
+  }
+
+  Future<void> _onExportBackupRequested(
+    ExportBackupRequested event,
+    Emitter<ExportState> emit,
+  ) async {
+    emit(ExportLoading());
+    try {
+      final path = await exportExpenses.backup();
+      emit(ExportSuccess(path));
+    } catch (e) {
+      emit(ExportError("Failed to create backup: $e"));
+    }
+  }
+
+  Future<void> _onRestoreLatestBackupRequested(
+    RestoreLatestBackupRequested event,
+    Emitter<ExportState> emit,
+  ) async {
+    emit(ExportLoading());
+    try {
+      final path = await exportExpenses.restoreLatestBackup();
+      emit(ExportSuccess(path));
+    } catch (e) {
+      emit(ExportError("Failed to restore backup: $e"));
     }
   }
 }

@@ -21,6 +21,13 @@ class _LoginPageState extends State<LoginPage> {
   final _password = TextEditingController();
 
   @override
+  void dispose() {
+    _email.dispose();
+    _password.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -66,7 +73,7 @@ class _LoginPageState extends State<LoginPage> {
                 const SizedBox(height: 32),
                 
                 Text(
-                  'Welcome Back',
+                  'Create Your Local Vault',
                   style: GoogleFonts.outfit(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
@@ -76,7 +83,7 @@ class _LoginPageState extends State<LoginPage> {
                 
                 const SizedBox(height: 8),
                 Text(
-                  'Sign in to manage your expenses',
+                  'Use an email and passcode to unlock your offline workspace',
                   style: GoogleFonts.outfit(
                     fontSize: 16,
                     color: AppColors.textSecondary,
@@ -111,7 +118,7 @@ class _LoginPageState extends State<LoginPage> {
                         TextFormField(
                           controller: _password,
                           decoration: const InputDecoration(
-                            labelText: 'Password',
+                            labelText: 'Passcode',
                             prefixIcon: Icon(Icons.lock_outline),
                           ),
                           obscureText: true,
@@ -166,7 +173,7 @@ class _LoginPageState extends State<LoginPage> {
                                         child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                                       )
                                     : Text(
-                                        'Login',
+                                        'Enter Ledgerly',
                                         style: GoogleFonts.outfit(
                                           fontSize: 18,
                                           fontWeight: FontWeight.bold,
@@ -176,6 +183,15 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             );
                           },
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          'Everything stays on this device unless you export it.',
+                          textAlign: TextAlign.center,
+                          style: GoogleFonts.outfit(
+                            color: AppColors.textSecondary,
+                            fontSize: 12,
+                          ),
                         ),
                       ],
                     ),

@@ -39,6 +39,7 @@ on<DeleteExpense>(_onDeleteExpense);
         amount: event.amount,
         paidBy: event.paidBy,
         category: event.category,
+        transactionType: event.transactionType,
         splits: event.splits,
         updatedAt: DateTime.now().toUtc(),
         version: 1,

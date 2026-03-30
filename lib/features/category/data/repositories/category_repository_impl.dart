@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
 import '../../../../core/database/isar_service.dart';
+import '../../category_icons.dart';
 import '../../domain/entities/category.dart';
 import '../models/category_isar.dart';
 
@@ -32,7 +33,7 @@ class CategoryRepositoryImpl implements CategoryRepository {
         .map((c) => TransactionCategory(
               id: c.id.toString(),
               name: c.name,
-              icon: IconData(c.iconCode, fontFamily: 'MaterialIcons'),
+              icon: categoryIconForCodePoint(c.iconCode),
               color: Color(c.colorValue),
               isDefault: c.isDefault,
             ))

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../category_icons.dart';
 import '../../domain/entities/category.dart';
 import '../bloc/category_bloc.dart';
 import '../bloc/category_event.dart';
@@ -25,21 +26,6 @@ class _CategoriesPageState extends State<CategoriesPage> {
     Color(0xFF4DB6AC),
     Color(0xFFFF8A65),
     Color(0xFFA1887F),
-  ];
-
-  static const _icons = [
-    Icons.restaurant,
-    Icons.directions_bus,
-    Icons.shopping_bag,
-    Icons.movie,
-    Icons.medical_services,
-    Icons.school,
-    Icons.receipt,
-    Icons.flight,
-    Icons.attach_money,
-    Icons.home_work_outlined,
-    Icons.fitness_center,
-    Icons.card_giftcard,
   ];
 
   @override
@@ -161,7 +147,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
   void _showCategoryDialog(BuildContext context, [TransactionCategory? existing]) {
     final nameController = TextEditingController(text: existing?.name ?? '');
     var selectedColor = existing?.color ?? _palette.first;
-    var selectedIcon = existing?.icon ?? _icons.first;
+    var selectedIcon = existing?.icon ?? kTransactionCategoryIcons.first;
 
     showDialog<void>(
       context: context,
@@ -239,7 +225,7 @@ class _CategoriesPageState extends State<CategoriesPage> {
                     Wrap(
                       spacing: 10,
                       runSpacing: 10,
-                      children: _icons.map((icon) {
+                      children: kTransactionCategoryIcons.map((icon) {
                         final selected = icon == selectedIcon;
                         return GestureDetector(
                           onTap: () {

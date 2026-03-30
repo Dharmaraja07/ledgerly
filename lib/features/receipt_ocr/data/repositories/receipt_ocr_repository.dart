@@ -1,3 +1,6 @@
+import 'dart:io' show Platform;
+
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:image_picker/image_picker.dart';
 import 'package:isar/isar.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -38,11 +41,18 @@ class ReceiptOcrRepository {
 
   Future<String?> pickReceiptFromGallery() async {
     try {
-      // Check storage permission
-      final storagePermission = await Permission.photos.request();
-      if (!storagePermission.isGranted) {
-        throw Exception('Storage permission denied');
+      // iOS: library access. Android: image_picker uses the Photo Picker (API 33+)
+      // or ACTION_GET_CONTENT; those do not require READ_MEDIA_IMAGES up front.
+      // Pre-requesting Permission.photos without matching manifest entries used to
+      // block picking entirely on Android.
+      if (!kIsWeb && Platform.isIOS) {
+        final photosPermission = await Permission.photos.request();
+        if (!photosPermission.isGranted && !photosPermission.isLimited) {
+          throw Exception('Photos permission denied');
+        }
       }
+      // Android: image_picker opens Photo Picker / document UI without requiring a
+      // prior Permission.photos grant (manifest declares READ_* for when needed).
 
       final picker = ImagePicker();
       final XFile? image = await picker.pickImage(

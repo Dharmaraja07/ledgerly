@@ -62,7 +62,16 @@ class _DocumentVaultScreenState extends State<DocumentVaultScreen>
           ),
         ],
       ),
-      body: BlocBuilder<DocumentVaultBloc, DocumentVaultState>(
+      body: BlocConsumer<DocumentVaultBloc, DocumentVaultState>(
+        listenWhen: (previous, current) =>
+            current.status == DocumentVaultStatus.failure &&
+            current.errorMessage != null &&
+            current.documents.isNotEmpty,
+        listener: (context, state) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(state.errorMessage!)),
+          );
+        },
         builder: (context, state) {
           if (state.status == DocumentVaultStatus.loading && state.documents.isEmpty) {
             return const Center(child: CircularProgressIndicator());
@@ -524,9 +533,12 @@ class _DocumentVaultScreenState extends State<DocumentVaultScreen>
   }
 
   void _showAddMenu() {
-    showModalBottomSheet(
+    // Modal routes sit above the current route, so the sheet's BuildContext is not a
+    // descendant of BlocProvider<DocumentVaultBloc>. Read the bloc from this route's context.
+    final bloc = context.read<DocumentVaultBloc>();
+    showModalBottomSheet<void>(
       context: context,
-      builder: (context) => Container(
+      builder: (sheetContext) => Container(
         padding: const EdgeInsets.all(20),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -535,24 +547,24 @@ class _DocumentVaultScreenState extends State<DocumentVaultScreen>
               leading: const Icon(Icons.file_upload),
               title: const Text('Upload File'),
               onTap: () {
-                Navigator.pop(context);
-                context.read<DocumentVaultBloc>().add(const UploadFile());
+                Navigator.pop(sheetContext);
+                bloc.add(const UploadFile());
               },
             ),
             ListTile(
               leading: const Icon(Icons.camera_alt),
               title: const Text('Take Photo'),
               onTap: () {
-                Navigator.pop(context);
-                context.read<DocumentVaultBloc>().add(UploadImage(ImageSource.camera));
+                Navigator.pop(sheetContext);
+                bloc.add(UploadImage(ImageSource.camera));
               },
             ),
             ListTile(
               leading: const Icon(Icons.photo_library),
               title: const Text('Choose from Gallery'),
               onTap: () {
-                Navigator.pop(context);
-                context.read<DocumentVaultBloc>().add(UploadImage(ImageSource.gallery));
+                Navigator.pop(sheetContext);
+                bloc.add(UploadImage(ImageSource.gallery));
               },
             ),
           ],

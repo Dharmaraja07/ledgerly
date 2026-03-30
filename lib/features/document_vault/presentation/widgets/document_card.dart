@@ -366,20 +366,21 @@ class DocumentCard extends StatelessWidget {
   }
 
   void _deleteDocument(BuildContext context) {
-    showDialog(
+    final bloc = context.read<DocumentVaultBloc>();
+    showDialog<void>(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('Delete Document'),
         content: Text('Are you sure you want to delete "${document.fileName}"?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
-              context.read<DocumentVaultBloc>().add(DeleteDocument(document.documentId));
+              Navigator.pop(dialogContext);
+              bloc.add(DeleteDocument(document.documentId));
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),
             child: const Text('Delete'),

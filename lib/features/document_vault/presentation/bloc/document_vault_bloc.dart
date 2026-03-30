@@ -1,9 +1,12 @@
+import 'dart:io' show Directory, File, Platform;
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
-import 'dart:io';
+import 'package:permission_handler/permission_handler.dart';
 import '../../data/models/document_isar.dart';
 import '../../data/repositories/document_repository.dart';
 
@@ -219,8 +222,35 @@ class DocumentVaultBloc extends Bloc<DocumentVaultEvent, DocumentVaultState> {
 
   Future<void> _onUploadImage(UploadImage event, Emitter<DocumentVaultState> emit) async {
     try {
+      if (event.source == ImageSource.camera) {
+        final camera = await Permission.camera.request();
+        if (!camera.isGranted) {
+          emit(state.copyWith(
+            status: DocumentVaultStatus.failure,
+            errorMessage: 'Camera permission denied',
+          ));
+          return;
+        }
+      } else if (event.source == ImageSource.gallery) {
+        if (!kIsWeb && Platform.isIOS) {
+          final photos = await Permission.photos.request();
+          if (!photos.isGranted && !photos.isLimited) {
+            emit(state.copyWith(
+              status: DocumentVaultStatus.failure,
+              errorMessage: 'Photos permission denied',
+            ));
+            return;
+          }
+        }
+      }
+
       final picker = ImagePicker();
-      final result = await picker.pickImage(source: event.source);
+      final result = await picker.pickImage(
+        source: event.source,
+        imageQuality: 85,
+        maxWidth: 4096,
+        maxHeight: 4096,
+      );
 
       if (result != null) {
         final file = File(result.path);

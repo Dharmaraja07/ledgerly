@@ -56,7 +56,19 @@ dependencies:
   percent_indicator: ^4.2.5
   flutter_timezone: ^5.0.1
   timezone: ^0.10.1
- 
+  flutter_localizations:
+    sdk: flutter
+  shared_preferences: ^2.5.4
+  pdf: ^3.11.3
+  printing: ^5.14.2
+  file_picker: ^8.1.6
+  image_picker: ^1.1.2
+  permission_handler: ^11.3.1
+  flutter_staggered_animations: ^1.1.1
+  table_calendar: ^3.1.2
+  math_expressions: ^2.6.0
+  crypto: ^3.0.6
+  encrypt: ^5.0.3
 
 dev_dependencies:
   flutter_test:
@@ -70,6 +82,14 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   isar_generator: ^3.1.0+1
   build_runner: ^2.4.11
+  flutter_launcher_icons: ^0.14.3
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: assets/app_icon.png
+  adaptive_icon_background: "#343432"
+  adaptive_icon_foreground: assets/app_icon.png
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

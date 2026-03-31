@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'dart:math' as math;
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
@@ -10,7 +9,6 @@ class SplashScreen extends StatelessWidget {
     // Premium Design Palette
     // Dark Space Blue / Nebula / Neon accent
     const colorBg1 = Color(0xFF0F172A); // Slate 900
-    const colorBg2 = Color(0xFF1E293B); // Slate 800
     const colorAccent = Color(0xFF6366F1); // Indigo 500
     const colorAccentPop = Color(0xFFC084FC); // Purple 400
 
@@ -28,7 +26,7 @@ class SplashScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
-                  colors: [colorAccent.withOpacity(0.3), Colors.transparent],
+                  colors: [colorAccent.withValues(alpha: 0.3), Colors.transparent],
                 ),
               ),
             ).animate(onPlay: (controller) => controller.repeat(reverse: true))
@@ -44,7 +42,7 @@ class SplashScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
-                  colors: [colorAccentPop.withOpacity(0.2), Colors.transparent],
+                  colors: [colorAccentPop.withValues(alpha: 0.2), Colors.transparent],
                 ),
               ),
             ).animate(onPlay: (controller) => controller.repeat(reverse: true))
@@ -70,7 +68,7 @@ class SplashScreen extends StatelessWidget {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: colorAccent.withOpacity(0.5),
+                            color: colorAccent.withValues(alpha: 0.5),
                             width: 2,
                           ),
                         ),
@@ -85,7 +83,7 @@ class SplashScreen extends StatelessWidget {
                           shape: BoxShape.circle,
                           boxShadow: [
                             BoxShadow(
-                              color: colorAccent.withOpacity(0.6),
+                              color: colorAccent.withValues(alpha: 0.6),
                               blurRadius: 20,
                               spreadRadius: 5,
                             )

@@ -50,3 +50,21 @@ dependencies {
 flutter {
     source = "../.."
 }
+
+// Icon font subsetting (tree shaking) can be killed with exit -9 (SIGKILL) on some hosts.
+// `tasks.withType<FlutterTask>()` often matches nothing: the plugin comes from `includeBuild`,
+// so the task type class may not equal the one referenced here. Configure by task name instead.
+afterEvaluate {
+    tasks.configureEach {
+        if (!name.startsWith("compileFlutterBuild")) return@configureEach
+        try {
+            val setter =
+                javaClass.methods.firstOrNull { m ->
+                    m.name == "setTreeShakeIcons" && m.parameterCount == 1
+                }
+            setter?.invoke(this, false)
+        } catch (_: Exception) {
+            // Ignore if task API changes.
+        }
+    }
+}

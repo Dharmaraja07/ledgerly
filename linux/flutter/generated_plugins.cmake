@@ -3,9 +3,11 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  file_selector_linux
   flutter_secure_storage_linux
   flutter_timezone
   isar_flutter_libs
+  printing
   url_launcher_linux
 )
 

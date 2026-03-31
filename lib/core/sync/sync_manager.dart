@@ -1,11 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:isar/isar.dart';
 import '../../features/auth/data/models/user_isar.dart';
-import '../../features/group/data/models/group_isar.dart';
-import '../../features/expense/data/models/expense_isar.dart';
 import 'sync_queue_isar.dart';
-import 'sync_entity_type.dart';
-import 'sync_operation_type.dart';
 
 class SyncManager {
   final Isar isar;
@@ -36,31 +32,7 @@ class SyncManager {
   }
 }
 
-Future<void> _syncExpense(SyncQueueIsar item) async {
-  final expense = await isar.expenseIsars
-      .filter()
-      .expenseIdEqualTo(item.entityId)
-      .findFirst();
 
-  if (expense == null) return;
-
-  await dio.post(
-    '/expenses/sync',
-    data: [
-      {
-        'id': expense.expenseId,
-        'group_id': expense.groupId,
-        'title': expense.title,
-        'amount': expense.amount,
-        'paid_by': expense.paidBy,
-        'category': expense.category,
-        'updatedAt': expense.updatedAt.toIso8601String(),
-        'version': expense.version,
-        'isDeleted': expense.isDeleted,
-      }
-    ],
-  );
-}
 
 
   Future<void> _markAsSynced(SyncQueueIsar item) async {

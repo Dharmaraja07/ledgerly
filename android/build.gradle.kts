@@ -1,7 +1,23 @@
+import com.android.build.gradle.BaseExtension
+
 allprojects {
     repositories {
         google()
         mavenCentral()
+    }
+}
+
+// Plugins like isar_flutter_libs may ship compileSdk < 31; resource merging then fails
+// (e.g. android:attr/lStar) when dependencies reference API 31+ attributes.
+subprojects {
+    afterEvaluate {
+        extensions.findByType<BaseExtension>()?.apply {
+            val current =
+                compileSdkVersion?.removePrefix("android-")?.toIntOrNull() ?: 0
+            if (current < 31) {
+                compileSdkVersion(31)
+            }
+        }
     }
 }
 

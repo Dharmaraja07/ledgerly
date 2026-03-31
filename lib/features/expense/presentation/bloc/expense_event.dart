@@ -10,6 +10,8 @@ class AddExpense extends ExpenseEvent {
   final String category;
   final Map<String, double> splits;
 
+  final TransactionType transactionType;
+
   AddExpense({
     required this.groupId,
     required this.title,
@@ -17,6 +19,7 @@ class AddExpense extends ExpenseEvent {
     required this.paidBy,
     required this.category,
     required this.splits,
+    this.transactionType = TransactionType.expense,
   });
 }
 class UpdateExpense extends ExpenseEvent {

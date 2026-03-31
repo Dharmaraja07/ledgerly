@@ -19,9 +19,10 @@ class DebtProgressChart extends StatelessWidget {
     }
 
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         _buildPieChart(),
-        const SizedBox(height: 20),
+        const SizedBox(height: 16),
         _buildLegend(),
       ],
     );
@@ -31,7 +32,7 @@ class DebtProgressChart extends StatelessWidget {
     final totalDebt = debts.fold(0.0, (sum, debt) => sum + debt.currentBalance);
     
     return SizedBox(
-      height: 150,
+      height: 120,
       child: PieChart(
         PieChartData(
           sectionsSpace: 2,
@@ -71,10 +72,12 @@ class DebtProgressChart extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        Wrap(
-          spacing: 8,
-          runSpacing: 4,
-          children: debts.map((debt) {
+        SizedBox(
+          height: 60,
+          child: Wrap(
+            spacing: 8,
+            runSpacing: 4,
+            children: debts.map((debt) {
             final color = _getColorForDebtType(debt.type);
             return Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -109,6 +112,7 @@ class DebtProgressChart extends StatelessWidget {
               ),
             );
           }).toList(),
+          ),
         ),
       ],
     );

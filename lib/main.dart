@@ -14,6 +14,9 @@ import 'features/expense/presentation/bloc/expense_bloc.dart';
 import 'features/settings/presentation/bloc/settings_bloc.dart';
 import 'features/settings/presentation/bloc/settings_event.dart';
 import 'features/category/presentation/bloc/category_bloc.dart';
+import 'features/bill_reminders/presentation/bloc/bill_reminder_bloc.dart';
+import 'features/debt_planner/presentation/bloc/debt_planner_bloc.dart';
+import 'features/investment/presentation/bloc/investment_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -51,6 +54,15 @@ void main() async {
         ),
         BlocProvider(
           create: (_) => getIt<CategoryBloc>(),
+        ),
+        BlocProvider(
+          create: (_) => getIt<BillReminderBloc>(),
+        ),
+        BlocProvider(
+          create: (_) => getIt<DebtPlannerBloc>(),
+        ),
+        BlocProvider(
+          create: (_) => getIt<InvestmentBloc>(),
         ),
       ],
       child: const LedgerlyApp(),

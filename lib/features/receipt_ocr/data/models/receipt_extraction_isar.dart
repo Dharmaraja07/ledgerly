@@ -86,7 +86,7 @@ class ReceiptExtractionIsar {
 @embedded
 class ExtractedItem {
   late String? itemName;
-  late String? description;
+  String? description;
   late double? quantity;
   late double? unitPrice;
   late double? totalPrice;

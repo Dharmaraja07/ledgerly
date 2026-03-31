@@ -306,9 +306,15 @@ class DocumentVaultBloc extends Bloc<DocumentVaultEvent, DocumentVaultState> {
       ..documentId = timestamp.toString()
       ..fileName = fileName
       ..filePath = savedFile.path
+      ..thumbnailPath = null
       ..type = fileType
+      ..category = null
+      ..tags = null
       ..fileSize = fileSize.toDouble()
       ..uploadDate = DateTime.now()
+      ..expirationDate = null
+      ..description = null
+      ..isEncrypted = false
       ..createdAt = DateTime.now()
       ..updatedAt = DateTime.now()
       ..version = 1

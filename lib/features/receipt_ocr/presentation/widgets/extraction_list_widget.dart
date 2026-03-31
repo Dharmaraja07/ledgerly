@@ -86,19 +86,19 @@ class ExtractionListWidget extends StatelessWidget {
   void _showDeleteConfirmation(BuildContext context, ReceiptExtractionIsar extraction) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: const Text('Delete Receipt'),
         content: Text(
           'Are you sure you want to delete the receipt from ${extraction.merchantName ?? 'Unknown Merchant'}?',
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => Navigator.of(dialogContext).pop(),
             child: const Text('Cancel'),
           ),
           TextButton(
             onPressed: () {
-              Navigator.of(context).pop();
+              Navigator.of(dialogContext).pop();
               context.read<ReceiptOcrBloc>().add(DeleteExtraction(extraction.extractionId));
             },
             style: TextButton.styleFrom(foregroundColor: Colors.red),

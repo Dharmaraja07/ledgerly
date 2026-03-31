@@ -37,6 +37,7 @@ class MockOcrService implements OcrService {
       ..merchantAddress = mockData['merchantAddress']
       ..transactionDate = mockData['transactionDate']
       ..purchaseDate = mockData['purchaseDate']
+      ..purchaseTime = null
       ..receiptNumber = mockData['receiptNumber']
       ..paymentMethod = mockData['paymentMethod']
       ..cardLastFour = mockData['cardLastFour']
@@ -92,17 +93,25 @@ class MockOcrService implements OcrService {
     final mockItems = [
       ExtractedItem()
         ..itemName = 'Cappuccino'
+        ..description = 'Freshly brewed coffee beverage'
         ..quantity = 2.0
         ..unitPrice = 4.50
         ..totalPrice = 9.00
         ..category = 'Beverages'
+        ..sku = null
+        ..discount = null
+        ..tax = null
         ..confidence = '0.95',
       ExtractedItem()
         ..itemName = 'Croissant'
+        ..description = 'Buttery French pastry'
         ..quantity = 1.0
         ..unitPrice = 3.25
         ..totalPrice = 3.25
         ..category = 'Bakery'
+        ..sku = null
+        ..discount = null
+        ..tax = null
         ..confidence = '0.92',
     ];
 
@@ -204,6 +213,23 @@ class GoogleVisionOcrService implements OcrService {
         ..imagePath = imagePath
         ..extractionDate = DateTime.now()
         ..status = ExtractionStatus.failed
+        ..totalAmount = null
+        ..currency = null
+        ..merchantName = null
+        ..merchantAddress = null
+        ..transactionDate = null
+        ..purchaseDate = null
+        ..purchaseTime = null
+        ..receiptNumber = null
+        ..paymentMethod = null
+        ..cardLastFour = null
+        ..category = null
+        ..items = []
+        ..taxAmount = null
+        ..tipAmount = null
+        ..discountAmount = null
+        ..subtotal = null
+        ..confidence = null
         ..rawText = 'Error: ${e.toString()}'
         ..metadata = {'error': e.toString()}
         ..createdAt = DateTime.now()
